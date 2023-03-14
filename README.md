@@ -6,7 +6,7 @@ See the next chapters to see options for downloading dependencies. If you would 
 
 This project uses GDAL as a dependency. To build this project, GDAL 3.5 libraries must be installed.
 This project was built and tested with GDAL 3.5.1 using the following release:
-curl.exe -S -O https://download.gisinternals.com/sdk/downloads/release-1928-x64-dev.zip
+curl.exe -S -O https://download.gisinternals.com/sdk/downloads/release-1928-x64-dev.zip (for Windows)
 
 The following paths need to be set:
 GDAL_HOME=$PWD/release-1928-x64
