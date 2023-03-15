@@ -1,11 +1,27 @@
 use gdal::{Dataset, DriverManager};
 
+fn process_layer_free(layer: gdal::raster::RasterBand) {
+    let minmax = layer.compute_raster_min_max(false);
+    match minmax {
+        Ok(res) => println!("min:{} max:{}", res.min, res.max),
+        Err(err) => panic!("{}", err.to_string()),
+    };
+}
+
+fn process_layer(layer: Result<gdal::raster::RasterBand, gdal::errors::GdalError>) {
+    match layer {
+        Ok(res) => process_layer_free(res),
+        Err(err) => panic!("{}", err.to_string()),
+    };
+}
+
 fn open_image(path: &str) {
     let result = Dataset::open(path);
+
     match result {
-        Ok(res) => println!("{} {}", res.raster_size().0, res.raster_size().1),
+        Ok(res) => process_layer(res.rasterband(1)),
         Err(err) => panic!("{}", err.to_string()),
-    }
+    };
 }
 
 fn main() {
