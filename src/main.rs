@@ -1,34 +1,8 @@
 use clap::Parser;
-use gdal::{errors::GdalError, Dataset, DriverManager};
-
-use crate::classifiers::MCMClassifier;
+use gdal::DriverManager;
 
 mod classifiers;
 mod persistence;
-
-fn process_layer_free(layer: gdal::raster::RasterBand) {
-    let minmax = layer.compute_raster_min_max(false);
-    match minmax {
-        Ok(res) => println!("min:{} max:{}", res.min, res.max),
-        Err(err) => panic!("{}", err.to_string()),
-    };
-}
-
-fn process_layer(layer: Result<gdal::raster::RasterBand, gdal::errors::GdalError>) {
-    match layer {
-        Ok(res) => process_layer_free(res),
-        Err(err) => panic!("{}", err.to_string()),
-    };
-}
-
-fn open_image(path: &str) {
-    let result = Dataset::open(path);
-
-    match result {
-        Ok(res) => process_layer(res.rasterband(1)),
-        Err(err) => panic!("{}", err.to_string()),
-    };
-}
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -57,9 +31,11 @@ fn main() {
         .classify::<f32>(classifiers::ClassificationType::Cloud)
         .unwrap();
 
-    for i in 100..1000 {
-        print!("{} ", res_image.data[i])
-    }
+    persistence::save_tiff(
+        &args.reference,
+        "E:/Programozas/terinfo/data/sentinel_2/not_cloudy/2023-03-20/test.tif",
+        &res_image,
+    );
 
     // open_image("E:/Programozas/terinfo/data/landsat_8-9/test/2023-02-10-00_00_2023-02-10-23_59_Landsat_8-9_L2_B05_(Raw).tiff");
 }
