@@ -1,5 +1,5 @@
 use clap::Parser;
-use gdal::DriverManager;
+use gdal::{raster::Buffer, DriverManager};
 
 mod classifiers;
 mod persistence;
@@ -27,15 +27,18 @@ fn main() {
     let mut classifier = classifiers::new_mcmclassifier(&args.reference).unwrap();
     //classifier.add_image(&args.target).unwrap();
 
-    let res_image = classifier
-        .classify::<f32>(classifiers::ClassificationType::Cloud)
+    let res_images = classifier
+        .classify(classifiers::ClassificationType::Cloud)
         .unwrap();
 
-    persistence::save_tiff(
-        &args.reference,
-        "E:/Programozas/terinfo/data/sentinel_2/not_cloudy/2023-03-20/test.tif",
-        &res_image,
-    );
+    for img in res_images.1 {
+        let buffer = Buffer::<u32>::new(res_images.0, img);
+        persistence::save_tiff(
+            &args.reference,
+            "E:/Programozas/terinfo/data/sentinel_2/not_cloudy/2023-03-20/test.tif",
+            &buffer,
+        );
+    }
 
     // open_image("E:/Programozas/terinfo/data/landsat_8-9/test/2023-02-10-00_00_2023-02-10-23_59_Landsat_8-9_L2_B05_(Raw).tiff");
 }
