@@ -4,7 +4,7 @@ use gdal::{
     Dataset,
 };
 
-pub fn save_tiff<T>(reference_img_path: &str, img_path: &str, buffer: &Buffer<T>)
+pub fn save_tif<T>(reference_img_path: &str, img_path: &str, buffer: &Buffer<T>)
 where
     T: Copy + GdalType,
 {

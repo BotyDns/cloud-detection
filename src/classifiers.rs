@@ -26,8 +26,15 @@ pub fn new_mcmclassifier(reference_image_path: &str) -> Result<MCMClassifier, Gd
     })
 }
 
-fn calculate_diff(lhs: Vec<f32>, rhs: Vec<f32>) -> Vec<f32> {
-    lhs.iter().zip(&rhs).map(|(l, r)| l - r).collect()
+fn calculate_diff(lhs: &Vec<f32>, rhs: &Vec<f32>) -> Vec<f32> {
+    let mut result = Vec::new();
+    result.resize(lhs.len(), 0.0);
+
+    for i in 0..lhs.len() {
+        result[i] = lhs[i] - rhs[i];
+    }
+
+    result
 }
 
 impl MCMClassifier {
@@ -52,7 +59,7 @@ impl MCMClassifier {
         let ref_data = &self.reference.1;
         let band_count = ref_data.raster_count();
 
-        if band_count < 11 {
+        if band_count < 6 {
             return Err(GdalError::BadArgument(
                 "There are not enough bands in the image!".to_string(),
             ));
@@ -73,12 +80,12 @@ impl MCMClassifier {
                 target_bands.push(target_data.rasterband(i)?.read_band_as::<f32>()?);
             }
 
-            let mut deltas: [Vec<f32>; 4];
-
-            deltas[0] = calculate_diff(target_bands[2].data, ref_bands[2].data);
-            deltas[1] = calculate_diff(target_bands[3].data, ref_bands[3].data);
-            deltas[2] = calculate_diff(target_bands[4].data, ref_bands[4].data);
-            deltas[3] = calculate_diff(target_bands[5].data, ref_bands[6].data);
+            let mut deltas: [Vec<f32>; 4] = [
+                calculate_diff(&target_bands[2].data, &ref_bands[2].data),
+                calculate_diff(&target_bands[3].data, &ref_bands[3].data),
+                calculate_diff(&target_bands[4].data, &ref_bands[4].data),
+                calculate_diff(&target_bands[5].data, &ref_bands[5].data),
+            ];
 
             let mut mask = Vec::new();
             mask.resize(ref_bands[0].data.len(), 0);

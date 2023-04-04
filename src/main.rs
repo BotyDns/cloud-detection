@@ -1,5 +1,6 @@
 use clap::Parser;
 use gdal::{raster::Buffer, DriverManager};
+use std::path::Path;
 
 mod classifiers;
 mod persistence;
@@ -25,7 +26,7 @@ fn main() {
     println!("target: {}", args.target);
 
     let mut classifier = classifiers::new_mcmclassifier(&args.reference).unwrap();
-    //classifier.add_image(&args.target).unwrap();
+    classifier.add_image(&args.target).unwrap();
 
     let res_images = classifier
         .classify(classifiers::ClassificationType::Cloud)
@@ -33,11 +34,13 @@ fn main() {
 
     for img in res_images.1 {
         let buffer = Buffer::<u32>::new(res_images.0, img);
-        persistence::save_tiff(
-            &args.reference,
-            "E:/Programozas/terinfo/data/sentinel_2/not_cloudy/2023-03-20/test.tif",
-            &buffer,
-        );
+        let target_path = Path::new(&args.target);
+        let parent_path = target_path.parent().unwrap();
+        let result_path = parent_path.join("test.tif");
+
+        println!("{}", result_path.to_str().unwrap());
+
+        persistence::save_tif(&args.reference, result_path.to_str().unwrap(), &buffer);
     }
 
     // open_image("E:/Programozas/terinfo/data/landsat_8-9/test/2023-02-10-00_00_2023-02-10-23_59_Landsat_8-9_L2_B05_(Raw).tiff");
