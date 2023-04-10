@@ -1,3 +1,5 @@
+use std::ops::Range;
+
 use crate::classifiers::util;
 use crate::classifiers::Classification;
 
@@ -6,6 +8,7 @@ use gdal::raster::Buffer;
 use gdal::Dataset;
 
 const MIN_RASTER_COUNT: isize = 6;
+const USEFUL_BAND_RANGE: Range<isize> = 1..MIN_RASTER_COUNT + 1;
 
 pub struct Classifier {
     target: Dataset,
@@ -27,18 +30,12 @@ impl Classifier {
             reference: reference_image,
         })
     }
-
-    fn get_rasters(dataset: Dataset) -> Result<Vec<Buffer<f32>>, GdalError> {
-        (1..MIN_RASTER_COUNT + 1)
-            .map(|i| dataset.rasterband(i)?.read_band_as::<f32>())
-            .collect()
-    }
 }
 
 impl Classification<u32> for Classifier {
     fn classify(self) -> Result<Buffer<u32>, GdalError> {
-        let reference_rasters = Classifier::get_rasters(self.reference)?;
-        let target_rasters = Classifier::get_rasters(self.target)?;
+        let reference_rasters = util::get_rasters(self.reference, USEFUL_BAND_RANGE)?;
+        let target_rasters = util::get_rasters(self.target, USEFUL_BAND_RANGE)?;
 
         let deltas: Vec<Vec<f32>> = (2..6)
             .map(|i| util::diff(&target_rasters[i].data, &reference_rasters[i].data))

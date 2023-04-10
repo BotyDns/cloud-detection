@@ -1,4 +1,10 @@
-use gdal::{errors::GdalError, Dataset};
+use std::ops::Range;
+
+use gdal::{
+    errors::GdalError,
+    raster::{Buffer, GdalType},
+    Dataset,
+};
 
 pub fn diff(lhs: &Vec<f32>, rhs: &Vec<f32>) -> Vec<f32> {
     lhs.iter().zip(rhs).map(|(l, r)| l - r).collect()
@@ -32,4 +38,13 @@ pub fn validate(
     }
 
     Ok(())
+}
+
+pub fn get_rasters<T: Copy + GdalType>(
+    dataset: Dataset,
+    range: Range<isize>,
+) -> Result<Vec<Buffer<T>>, GdalError> {
+    range
+        .map(|i| dataset.rasterband(i)?.read_band_as::<T>())
+        .collect()
 }
