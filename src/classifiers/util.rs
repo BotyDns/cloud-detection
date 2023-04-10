@@ -1,5 +1,3 @@
-use std::ops::Range;
-
 use gdal::{
     errors::GdalError,
     raster::{Buffer, GdalType},
@@ -42,9 +40,10 @@ pub fn validate(
 
 pub fn get_rasters<T: Copy + GdalType>(
     dataset: Dataset,
-    range: Range<isize>,
+    indices: &[isize],
 ) -> Result<Vec<Buffer<T>>, GdalError> {
-    range
-        .map(|i| dataset.rasterband(i)?.read_band_as::<T>())
+    indices
+        .iter()
+        .map(|&i| dataset.rasterband(i)?.read_band_as::<T>())
         .collect()
 }
