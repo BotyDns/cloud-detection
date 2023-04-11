@@ -44,9 +44,10 @@ where
     let parent_path = target_path_obj.parent().unwrap();
     let result_path = parent_path.join("result.tif");
 
+    persistence::tif::save(reference_path, result_path.to_str().unwrap(), &res_image);
+
     println!("Classification successful!");
     println!("Classified image path: {}", result_path.to_str().unwrap());
-    persistence::tif::save(reference_path, result_path.to_str().unwrap(), &res_image);
 }
 
 fn main() {

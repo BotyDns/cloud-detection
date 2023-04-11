@@ -5,8 +5,8 @@ use gdal::errors::GdalError;
 use gdal::raster::Buffer;
 use gdal::Dataset;
 
-const MIN_RASTER_COUNT: isize = 6;
-const USEFUL_BANDS: [isize; 4] = [3, 4, 5, 6];
+const MIN_RASTER_COUNT: isize = 4;
+const USEFUL_BANDS: [isize; 2] = [3, 4];
 
 pub struct Classifier {
     target: Dataset,
