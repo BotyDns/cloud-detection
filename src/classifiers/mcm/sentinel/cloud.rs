@@ -4,23 +4,21 @@ use crate::classifiers::Classification;
 use gdal::errors::GdalError;
 use gdal::raster::Buffer;
 
-/// Cloud classifier object for Landsat 8-9 images.
+/// Cloud classifier object for Sentinel-2 images.
 /// # Examples
 /// ```
+/// use cloud_detection::classifiers::Classification;
 /// use cloud_detection::classifiers::mcm::sentinel;
+/// use cloud_detection::persistence;
 ///
-/// // -- irrelevant code --
-///
-/// // Create classifier
-/// let classifier = sentinel::cloud::Classifier::from_path("./reference.tif", "/target.tif").unwrap();
-///
-/// // Classify the image
-/// let res_image = classifier.classify().unwrap();
-///
-/// // Save the results
-/// persistence::tif::save("./reference.tif", "./result.tif", &res_image);
-///
-/// // -- irrelevant code --
+/// fn main () {
+///     // Create classifier
+///     let classifier = sentinel::cloud::Classifier::from_path("./reference.tif", "/target.tif").unwrap();
+///     // Classify the image
+///     let res_image = classifier.classify().unwrap();
+///     // Save the results
+///     persistence::tif::save("./reference.tif", "./result.tif", &res_image);
+/// }
 /// ```
 pub struct Classifier {
     implementation: landsat::cloud::Classifier,
