@@ -8,12 +8,31 @@ use gdal::Dataset;
 const MIN_RASTER_COUNT: isize = 4;
 const USEFUL_BANDS: [isize; 2] = [3, 4];
 
+/// Cloud classifier object for Landsat 8-9 images.
+/// # Examples
+/// ```
+/// use cloud_detection::classifiers::mcm::landsat;
+///
+/// // -- irrelevant code --
+///
+/// // Create classifier
+/// let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "/target.tif").unwrap();
+///
+/// // Classify the image
+/// let res_image = classifier.classify().unwrap();
+///
+/// // Save the results
+/// persistence::tif::save("./reference.tif", "./result.tif", &res_image);
+///
+/// // -- irrelevant code --
+/// ```
 pub struct Classifier {
     target: Dataset,
     reference: Dataset,
 }
 
 impl Classifier {
+    /// Creates a classifier from the given target and referenc image paths.
     pub fn from_path(
         reference_image_path: &str,
         target_image_path: &str,
@@ -31,6 +50,7 @@ impl Classifier {
 }
 
 impl Classification<u32> for Classifier {
+    /// Creates a cloud mask for Landsat 8-9 images.
     fn classify(self) -> Result<Buffer<u32>, GdalError> {
         let reference_rasters = util::get_rasters(self.reference, &USEFUL_BANDS)?;
         let target_rasters = util::get_rasters(self.target, &USEFUL_BANDS)?;

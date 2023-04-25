@@ -10,7 +10,7 @@ use cloud_detection::persistence;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-/// A command line tool to detect multitemporal cloud and cloud-shadow masks.
+/// A command line tool to detect clouds and cloud-shadows
 struct CMDArgs {
     #[arg(value_enum)]
     /// The satellite from which the image was created

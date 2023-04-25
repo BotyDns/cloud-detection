@@ -3,6 +3,7 @@ use gdal::{
     Dataset,
 };
 
+/// Saves the given buffer to the given path. Uses another images as reference to configure the output image.
 pub fn save<T>(reference_img_path: &str, img_path: &str, buffer: &Buffer<T>)
 where
     T: Copy + GdalType,

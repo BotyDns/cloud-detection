@@ -1,13 +1,19 @@
+//! This module provides utilities for for different masking tasks
+
+use std::ops::Sub;
+
 use gdal::{
     errors::GdalError,
     raster::{Buffer, GdalType},
     Dataset,
 };
 
-pub fn diff(lhs: &Vec<f32>, rhs: &Vec<f32>) -> Vec<f32> {
-    lhs.iter().zip(rhs).map(|(l, r)| l - r).collect()
+/// Calculates the difference between the elements of two vectors and returns a new vector with the difference
+pub fn diff<T: Sub<Output = T> + Copy>(lhs: &Vec<T>, rhs: &Vec<T>) -> Vec<T> {
+    lhs.iter().zip(rhs).map(|(&l, &r)| l - r).collect()
 }
 
+/// Validates the reference and target datasets.
 pub fn validate(
     reference_dataset: &Dataset,
     target_dataset: &Dataset,
@@ -38,6 +44,7 @@ pub fn validate(
     Ok(())
 }
 
+/// Extracts the required rasters from the dataset
 pub fn get_rasters<T: Copy + GdalType>(
     dataset: Dataset,
     indices: &[isize],
