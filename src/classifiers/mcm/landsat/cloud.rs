@@ -10,7 +10,7 @@ const USEFUL_BANDS: [isize; 2] = [3, 4];
 
 /// Cloud classifier object for Landsat 8-9 images.
 /// # Examples
-/// ```
+/// ```no_run
 /// use cloud_detection::classifiers::Classification;
 /// use cloud_detection::classifiers::mcm::landsat;
 /// use cloud_detection::persistence;

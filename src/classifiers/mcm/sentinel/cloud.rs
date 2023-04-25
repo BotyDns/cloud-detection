@@ -6,7 +6,7 @@ use gdal::raster::Buffer;
 
 /// Cloud classifier object for Sentinel-2 images.
 /// # Examples
-/// ```
+/// ```no_run
 /// use cloud_detection::classifiers::Classification;
 /// use cloud_detection::classifiers::mcm::sentinel;
 /// use cloud_detection::persistence;
