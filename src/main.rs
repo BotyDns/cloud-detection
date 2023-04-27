@@ -1,10 +1,7 @@
 use clap::{Parser, ValueEnum};
 use cloud_detection::classifiers::Classification;
 use cloud_detection::comparison;
-use gdal::raster::Buffer;
-use gdal::raster::GdalType;
 use gdal::DriverManager;
-use std::path::Path;
 
 use cloud_detection::classifiers::mcm::landsat;
 use cloud_detection::classifiers::mcm::sentinel;
@@ -39,23 +36,6 @@ enum Satellites {
     Landsat,
 }
 
-fn save<T>(classified_image: &Buffer<T>, reference_path: &str, target_path: &str)
-where
-    T: Copy + GdalType,
-{
-    let target_path_obj = Path::new(target_path);
-    let parent_path = target_path_obj.parent().unwrap();
-    let result_path = parent_path.join("result.tif");
-
-    persistence::tif::save(
-        reference_path,
-        result_path.to_str().unwrap(),
-        classified_image,
-    );
-
-    println!("Classified image path: {}", result_path.to_str().unwrap());
-}
-
 fn main() {
     DriverManager::register_all();
     let args = CMDArgs::parse();
@@ -79,14 +59,16 @@ fn main() {
     if let Some(classified_image_path) = args.comparison_image {
         let classified_image =
             persistence::tif::open_classified_image(&res_image, &classified_image_path).unwrap();
-        let matrix = comparison::create_confusion_matrix(&res_image.data, &classified_image.data);
+        let matrix = comparison::create_confusion_matrix(&classified_image.data, &res_image.data);
 
         println!("Overall accuracy: {}", matrix.overall_accuracy());
+        println!("false positive rate: {}", matrix.false_rate("1"));
+        println!("false negative rate: {}", matrix.false_rate("0"));
         println!("Confusion matrix:");
         println!("{}", matrix);
     }
 
-    save(&res_image, &args.reference, &args.target);
+    persistence::tif::save_classification(&res_image, &args.reference, &args.target);
 
     println!("Classification successful!");
 }

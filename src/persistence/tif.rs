@@ -1,4 +1,4 @@
-use std::thread::current;
+use std::path::Path;
 
 use gdal::{
     errors::GdalError,
@@ -47,7 +47,7 @@ pub fn open_classified_image(
 
     let reference_raster_size = reference_dataset.raster_size();
 
-    if (reference_raster_size != current_classification.size) {
+    if reference_raster_size != current_classification.size {
         return Err(GdalError::BadArgument(format!("The size of the reference image does not match the size of the classified image!\nclassified image size:({},{})\nreferenc image size:({},{})",
         reference_raster_size.0,
         reference_raster_size.1,
@@ -57,4 +57,38 @@ pub fn open_classified_image(
     }
 
     Ok(reference_dataset.rasterband(1)?.read_band_as::<u32>()?)
+}
+
+/// Saves the classified image to the given target path.
+/// A reference image path should be given as well to properly configure the output image.
+/// # Examples
+/// ## Extract a band from a tif file and save it to a separate file.
+/// ```no_run
+///
+/// use cloud_detection::persistence;
+/// use cloud_detection::classifiers::mcm::landsat;
+/// use cloud_detection::classifiers::Classification;
+///
+/// fn main() {
+///     let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "./target.tif").unwrap();
+///     let result = classifier.classify().unwrap();
+///
+///     persistence::tif::save_classification(&result, "./reference.tif", "output.tif");
+/// }
+/// ```
+pub fn save_classification<T>(classified_image: &Buffer<T>, reference_path: &str, output_path: &str)
+where
+    T: Copy + GdalType,
+{
+    let output_path_obj = Path::new(output_path);
+    let parent_path = output_path_obj.parent().unwrap();
+    let result_path = parent_path.join("result.tif");
+
+    save(
+        reference_path,
+        result_path.to_str().unwrap(),
+        classified_image,
+    );
+
+    println!("Classified image path: {}", result_path.to_str().unwrap());
 }

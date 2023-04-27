@@ -30,7 +30,7 @@ pub struct Classifier {
 }
 
 impl Classifier {
-    /// Creates a classifier from the given target and referenc image paths.
+    /// Creates a classifier from the given target and reference image paths.
     pub fn from_path(
         reference_image_path: &str,
         target_image_path: &str,

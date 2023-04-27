@@ -3,7 +3,8 @@
 use confusion_matrix::{self, ConfusionMatrix};
 
 /// Creates a confusion matrix from a reference classification and target classification.
-/// The resulting dataframe will have the reference image as the columns and the target image as the rows.
+/// The reference image is the one that is considered the "actual" image
+/// The target image is the one that is created by the model
 pub fn create_confusion_matrix(
     reference_classification: &Vec<u32>,
     target_classification: &Vec<u32>,
