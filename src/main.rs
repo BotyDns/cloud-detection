@@ -80,6 +80,8 @@ fn main() {
         let classified_image =
             persistence::tif::open_classified_image(&res_image, &classified_image_path).unwrap();
         let matrix = comparison::create_confusion_matrix(&res_image.data, &classified_image.data);
+
+        println!("Overall accuracy: {}", matrix.overall_accuracy());
         println!("Confusion matrix:");
         println!("{}", matrix);
     }
