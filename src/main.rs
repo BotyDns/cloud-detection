@@ -23,6 +23,10 @@ struct CMDArgs {
     #[arg(short, long)]
     /// Path to the target image
     target: String,
+
+    #[arg(short, long)]
+    /// Path to an already classified image, for confusion matrix comparison
+    comparison_image: Option<String>,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -69,4 +73,6 @@ fn main() {
             classify_and_save(classifier, &args.reference, &args.target)
         }
     };
+
+    
 }
