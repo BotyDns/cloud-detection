@@ -1,5 +1,7 @@
 use clap::{Parser, ValueEnum};
 use cloud_detection::classifiers::Classification;
+use cloud_detection::comparison;
+use gdal::raster::Buffer;
 use gdal::raster::GdalType;
 use gdal::DriverManager;
 use std::path::Path;
@@ -37,20 +39,20 @@ enum Satellites {
     Landsat,
 }
 
-fn classify_and_save<C, T>(classifier: C, reference_path: &str, target_path: &str)
+fn save<T>(classified_image: &Buffer<T>, reference_path: &str, target_path: &str)
 where
-    C: Classification<T>,
     T: Copy + GdalType,
 {
-    let res_image = classifier.classify().unwrap();
-
     let target_path_obj = Path::new(target_path);
     let parent_path = target_path_obj.parent().unwrap();
     let result_path = parent_path.join("result.tif");
 
-    persistence::tif::save(reference_path, result_path.to_str().unwrap(), &res_image);
+    persistence::tif::save(
+        reference_path,
+        result_path.to_str().unwrap(),
+        classified_image,
+    );
 
-    println!("Classification successful!");
     println!("Classified image path: {}", result_path.to_str().unwrap());
 }
 
@@ -61,18 +63,28 @@ fn main() {
     println!("reference image path: {}", args.reference);
     println!("target image path: {}", args.target);
 
-    match args.satellite {
+    let res_image = match args.satellite {
         Satellites::Landsat => {
             let classifier =
                 landsat::cloud::Classifier::from_path(&args.reference, &args.target).unwrap();
-            classify_and_save(classifier, &args.reference, &args.target)
+            classifier.classify().unwrap()
         }
         Satellites::Sentinel => {
             let classifier =
                 sentinel::cloud::Classifier::from_path(&args.reference, &args.target).unwrap();
-            classify_and_save(classifier, &args.reference, &args.target)
+            classifier.classify().unwrap()
         }
     };
 
-    
+    if let Some(classified_image_path) = args.comparison_image {
+        let classified_image =
+            persistence::tif::open_classified_image(&res_image, &classified_image_path).unwrap();
+        let matrix = comparison::create_confusion_matrix(&res_image.data, &classified_image.data);
+        println!("Confusion matrix:");
+        println!("{}", matrix);
+    }
+
+    save(&res_image, &args.reference, &args.target);
+
+    println!("Classification successful!");
 }
