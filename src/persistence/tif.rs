@@ -1,3 +1,5 @@
+//! This module provides tools for saving and loading tif images.
+
 use std::path::Path;
 
 use gdal::{
@@ -32,6 +34,25 @@ where
     dataset.flush_cache();
 }
 
+/// opens and validates an already classified image.
+///  
+/// **Parameters**:
+/// - current_classification: the image that we just classified (it is used to validate the loaded image).
+/// - reference_classification_path: the image that we want to load.
+/// # Examples:
+/// ```no_run
+/// use cloud_detection::persistence;
+/// use cloud_detection::classifiers::mcm::landsat;
+/// use cloud_detection::classifiers::Classification;
+///
+/// fn main() {
+///     let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "./target.tif").unwrap();
+///     let result = classifier.classify().unwrap();
+///
+///     let validation_image = persistence::tif::open_classified_image(&result, "./validation_image.tif").unwrap();
+/// }
+///
+/// ```
 pub fn open_classified_image(
     current_classification: &Buffer<u32>,
     reference_classification_path: &str,

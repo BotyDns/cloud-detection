@@ -1,3 +1,3 @@
-//! This module provides a few tools for saving tif images.
+//! This module contains the tools required to interact with the file-system.
 
 pub mod tif;
