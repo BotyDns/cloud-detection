@@ -40,9 +40,6 @@ fn main() {
     DriverManager::register_all();
     let args = CMDArgs::parse();
 
-    println!("reference image path: {}", args.reference);
-    println!("target image path: {}", args.target);
-
     let res_image = match args.satellite {
         Satellites::Landsat => {
             let classifier =
