@@ -24,7 +24,7 @@ struct CMDArgs {
     target: String,
 
     #[arg(short, long)]
-    /// Path to an already classified image, for confusion matrix comparison
+    /// Path to an already classified image. This will be used as reference to verify classification accuracy.
     comparison_image: Option<String>,
 }
 
