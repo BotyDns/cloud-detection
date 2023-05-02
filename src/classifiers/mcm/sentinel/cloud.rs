@@ -61,7 +61,7 @@ impl Classification<u32> for Classifier {
         let mask = deltas[0]
             .iter()
             .zip(&deltas[1])
-            .map(|(&l, &r)| (l > 0.1 && r > 0.1) as u32)
+            .map(|(&l, &r)| (l > 0.15 && r > 0.15) as u32)
             .collect();
 
         Ok(Buffer::new(reference_rasters[0].size, mask))
