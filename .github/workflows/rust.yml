@@ -13,6 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    container:
+      image: osgeo/gdal:ubuntu-full-3.6.0
 
     steps:
     - uses: actions/checkout@v3
