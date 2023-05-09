@@ -14,7 +14,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: osgeo/gdal:ubuntu-full-3.6.0
+      image: osgeo/gdal:ubuntu-full-3.5.0
 
     steps:
     - name: Checkout code
