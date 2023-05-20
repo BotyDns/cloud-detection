@@ -4,7 +4,7 @@ The purpose of this project is to reproduce the MCM algorithm provided in this [
 
 The program is able to currently mask thick clouds using landsat 8-9 images.
 
-## Dependencies
+## Dependencies (Windows)
 
 To install dependencies manually, follow this description.
 
