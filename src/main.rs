@@ -1,6 +1,7 @@
 use clap::{Parser, ValueEnum};
 use cloud_detection::classifiers::Classification;
 use cloud_detection::comparison;
+use cloud_detection::persistence::config::CloudDetectionConfig;
 use confusion_matrix::ConfusionMatrix;
 use gdal::errors::GdalError;
 use gdal::raster::Buffer;
@@ -27,6 +28,10 @@ struct CMDArgs {
     /// Path to the target image
     target: String,
 
+    #[arg(long)]
+    /// Path to the configuration file. If no configuration file is found, one is generated with the default values.
+    config_path: Option<String>,
+
     #[arg(short, long)]
     /// Path to an already classified image. This will be used as reference to verify classification accuracy.
     comparison_image: Option<String>,
@@ -40,14 +45,16 @@ enum Satellites {
     Landsat,
 }
 
-fn classify(args: &CMDArgs) -> Result<Buffer<u32>, GdalError> {
+fn classify(args: &CMDArgs, config: &CloudDetectionConfig) -> Result<Buffer<u32>, GdalError> {
     match args.satellite {
         Satellites::Landsat => {
-            let classifier = landsat::cloud::Classifier::from_path(&args.reference, &args.target)?;
+            let classifier =
+                landsat::cloud::Classifier::from_path(&args.reference, &args.target, &config)?;
             classifier.classify()
         }
         Satellites::Sentinel => {
-            let classifier = sentinel::cloud::Classifier::from_path(&args.reference, &args.target)?;
+            let classifier =
+                sentinel::cloud::Classifier::from_path(&args.reference, &args.target, &config)?;
             classifier.classify()
         }
     }
@@ -66,10 +73,12 @@ fn create_statistics(
 fn main() -> Result<(), Box<dyn Error>> {
     DriverManager::register_all();
     let args = CMDArgs::parse();
+    let config = persistence::config::load_config(&args.config_path)?;
 
-    let res_image = match classify(&args) {
+    let res_image = match classify(&args, &config) {
         Ok(img) => Ok(img),
         Err(GdalError::NullPointer { method_name: _, msg: _ }) => Err("Could not open files for classification. Reference image path or target image path is incorrect.".to_owned()),
+        Err(GdalError::BadArgument(str)) => Err(str),
         Err(err) => Err(err.to_string())
     }?;
 
@@ -83,6 +92,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 "Could not open comparison image. The path for the comparison image is incorrect."
                     .to_owned(),
             ),
+            Err(GdalError::BadArgument(str)) => Err(str),
             Err(err) => Err(err.to_string()),
         }?;
 

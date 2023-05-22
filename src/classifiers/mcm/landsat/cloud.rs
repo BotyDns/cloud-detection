@@ -1,12 +1,10 @@
 use crate::classifiers::util;
 use crate::classifiers::Classification;
+use crate::persistence::config::CloudDetectionConfig;
 
 use gdal::errors::GdalError;
 use gdal::raster::Buffer;
 use gdal::Dataset;
-
-const MIN_RASTER_COUNT: isize = 4;
-const USEFUL_BANDS: [isize; 2] = [3, 4];
 
 /// Cloud classifier object for Landsat 8-9 images.
 /// # Examples
@@ -27,6 +25,7 @@ const USEFUL_BANDS: [isize; 2] = [3, 4];
 pub struct Classifier {
     target: Dataset,
     reference: Dataset,
+    useful_bands: Vec<isize>,
 }
 
 impl Classifier {
@@ -34,15 +33,24 @@ impl Classifier {
     pub fn from_path(
         reference_image_path: &str,
         target_image_path: &str,
+        config: &CloudDetectionConfig,
     ) -> Result<Classifier, GdalError> {
         let reference_image = Dataset::open(reference_image_path)?;
         let target_image = Dataset::open(target_image_path)?;
 
-        util::validate(&reference_image, &target_image, MIN_RASTER_COUNT)?;
+        let useful_bands = vec![
+            config.landsat.green_band_index,
+            config.landsat.red_band_index,
+        ];
+
+        let min_band_count = isize::from(useful_bands.iter().max().unwrap().clone());
+
+        util::validate(&reference_image, &target_image, min_band_count)?;
 
         Ok(Classifier {
             target: target_image,
             reference: reference_image,
+            useful_bands: useful_bands,
         })
     }
 }
@@ -50,8 +58,8 @@ impl Classifier {
 impl Classification<u32> for Classifier {
     /// Creates a cloud mask for Landsat 8-9 images.
     fn classify(self) -> Result<Buffer<u32>, GdalError> {
-        let reference_rasters = util::get_rasters(self.reference, &USEFUL_BANDS)?;
-        let target_rasters = util::get_rasters(self.target, &USEFUL_BANDS)?;
+        let reference_rasters = util::get_rasters(self.reference, &self.useful_bands)?;
+        let target_rasters = util::get_rasters(self.target, &self.useful_bands)?;
 
         let deltas: Vec<Vec<f32>> = target_rasters
             .iter()

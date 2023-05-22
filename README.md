@@ -21,7 +21,7 @@ also, for a weird reason you need to add the GDAL_VERSION to your variables as w
 ## Usage
 
 The current implementation supports the `Float32` Tiff format.  
-For cloud masking the images should be merged and should contain the following bands (in the given order, also):
+For cloud masking the images should be merged and and by default should contain the following bands in the given order (see [Configuration](#configuration) to change the order of bands):
 
 1. Doesn't matter
 2. Doesn't matter
@@ -30,7 +30,25 @@ For cloud masking the images should be merged and should contain the following b
 
 In the current implementation it is only important that the green band should land on band 3 and the blue band should land on band 4. The other bands are not used in the algorithm.
 
-### Executing the binary file
+## Configuration
+
+It is possible to modify which bands are read by the application by specifying a configuration path via `--config-path`. Configuration is in TOML (`.toml`) format. If no configuration file is found, one is generated at the given path with the default values.
+
+### Configuration parameter reference
+
+```toml
+# configuration for Landsat 8-9 images
+[landsat]
+green_band_index = 3 # At what index (starting from 1) is the green band found.
+red_band_index = 4 # At what index (starting from 1) is the red band found.
+
+# configuration for Sentinel-2 images
+[sentinel]
+green_band_index = 3 # At what index (starting from 1) is the green band found.
+red_band_index = 4 # At what index (starting from 1) is the red band found.
+```
+
+## Executing the binary file
 
 Here's an example on how to run the executable:  
 `./cloud-detection.exe landsat --reference reference.tif --target target.tif`

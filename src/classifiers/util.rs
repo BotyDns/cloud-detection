@@ -47,7 +47,7 @@ pub fn validate(
 /// Extracts the required rasters from the dataset
 pub fn get_rasters<T: Copy + GdalType>(
     dataset: Dataset,
-    indices: &[isize],
+    indices: &Vec<isize>,
 ) -> Result<Vec<Buffer<T>>, GdalError> {
     indices
         .iter()

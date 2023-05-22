@@ -69,7 +69,7 @@ pub fn open_classified_image(
     let reference_raster_size = reference_dataset.raster_size();
 
     if reference_raster_size != current_classification.size {
-        return Err(GdalError::BadArgument(format!("The size of the reference image does not match the size of the classified image!\nclassified image size:({},{})\nreferenc image size:({},{})",
+        return Err(GdalError::BadArgument(format!("The size of the reference image does not match the size of the classified image!\nclassified image size:({},{})\nreference image size:({},{})",
         reference_raster_size.0,
         reference_raster_size.1,
         current_classification.size.0,

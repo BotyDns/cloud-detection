@@ -8,4 +8,6 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.1.14", features = ["derive"] }
 confusion_matrix = "1.0.0"
+confy = "0.5.1"
 gdal = "0.14.0"
+serde = "1.0.163"
