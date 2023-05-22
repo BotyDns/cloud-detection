@@ -29,7 +29,7 @@ struct CMDArgs {
     target: String,
 
     #[arg(long)]
-    /// Path to the configuration file. If no configuration file is found, one is generated with the default values.
+    /// Path to the configuration file. If no configuration file is found at the given path, one is generated there with the default values.
     config_path: Option<String>,
 
     #[arg(short, long)]
