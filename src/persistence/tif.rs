@@ -44,9 +44,10 @@ where
 /// use cloud_detection::persistence;
 /// use cloud_detection::classifiers::mcm::landsat;
 /// use cloud_detection::classifiers::Classification;
+/// use crate::persistence::config::CloudDetectionConfig;
 ///
 /// fn main() {
-///     let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "./target.tif").unwrap();
+///     let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "./target.tif", &CloudDetectionConfig::default()).unwrap();
 ///     let result = classifier.classify().unwrap();
 ///
 ///     let validation_image = persistence::tif::open_classified_image(&result, "./validation_image.tif").unwrap();
@@ -89,9 +90,10 @@ pub fn open_classified_image(
 /// use cloud_detection::persistence;
 /// use cloud_detection::classifiers::mcm::landsat;
 /// use cloud_detection::classifiers::Classification;
+/// use crate::persistence::config::CloudDetectionConfig;
 ///
 /// fn main() {
-///     let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "./target.tif").unwrap();
+///     let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "./target.tif", &CloudDetectionConfig::default()).unwrap();
 ///     let result = classifier.classify().unwrap();
 ///
 ///     persistence::tif::save_classification(&result, "./reference.tif", "output.tif");

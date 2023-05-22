@@ -12,10 +12,11 @@ use gdal::Dataset;
 /// use cloud_detection::classifiers::Classification;
 /// use cloud_detection::classifiers::mcm::landsat;
 /// use cloud_detection::persistence;
+/// use crate::persistence::config::CloudDetectionConfig;
 ///
 /// fn main () {
 ///     // Create classifier
-///     let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "/target.tif").unwrap();
+///     let classifier = landsat::cloud::Classifier::from_path("./reference.tif", "/target.tif", &CloudDetectionConfig::default()).unwrap();
 ///     // Classify the image
 ///     let res_image = classifier.classify().unwrap();
 ///     // Save the results
